@@ -6,9 +6,6 @@ const JAVA_PORT = "25565";
 const BEDROCK_PORT = "19132";
 const COPY_IP = SERVER_DOMAIN;
 
-// If you deploy the included Cloudflare Worker, point this at it
-// e.g. "https://coffemc-api.yourname.workers.dev"
-// Leave empty to call mcsrvstat.us directly from the browser.
 const WORKER_URL = "";
 
 let checking = false;
@@ -90,17 +87,15 @@ async function checkServer(){
     applyStatus(bedrockData, els.playersBedrock, els.dotBedrock);
 
     const javaOnline    = javaData?.online    ? (javaData.players?.online ?? 0)    : 0;
-    const javaMax       = javaData?.online    ? (javaData.players?.max ?? 0)       : 0;
     const bedrockOnline = bedrockData?.online ? (bedrockData.players?.online ?? 0) : 0;
-    const bedrockMax    = bedrockData?.online ? (bedrockData.players?.max ?? 0)    : 0;
+    const totalOnline   = javaOnline + bedrockOnline;
+    const anyOnline     = !!(javaData?.online || bedrockData?.online);
 
-    const totalOnline = javaOnline + bedrockOnline;
-    const totalMax    = javaMax + bedrockMax;
-    const anyOnline   = !!(javaData?.online || bedrockData?.online);
-
+    // combined total, no max slots shown
     if(els.onlineEl) els.onlineEl.textContent = totalOnline;
-    if(els.maxEl)    els.maxEl.textContent = totalMax;
+    if(els.maxEl)    els.maxEl.textContent = "";
 
+    // merge real player name lists from both editions
     const list = [
       ...(javaData?.players?.list ?? []),
       ...(bedrockData?.players?.list ?? [])
@@ -118,7 +113,7 @@ async function checkServer(){
     if(els.dotJava)    els.dotJava.classList.remove("online");
     if(els.dotBedrock) els.dotBedrock.classList.remove("online");
     if(els.onlineEl) els.onlineEl.textContent = "0";
-    if(els.maxEl)    els.maxEl.textContent = "0";
+    if(els.maxEl)    els.maxEl.textContent = "";
     renderOfflineState(els);
   }finally{
     checking = false;
@@ -128,8 +123,7 @@ async function checkServer(){
 function applyStatus(data, textEl, dotEl){
   if(data && data.online === true){
     const online = data.players?.online ?? 0;
-    const max    = data.players?.max ?? 0;
-    if(textEl) textEl.textContent = `${online}/${max}`;
+    if(textEl) textEl.textContent = `${online} online`;
     if(dotEl) dotEl.classList.add("online");
   }else{
     if(textEl) textEl.textContent = "Offline";
@@ -152,8 +146,13 @@ function renderPlayerList(online, list, els){
 
       const img = document.createElement("img");
       img.src = `https://mc-heads.net/avatar/${encodeURIComponent(name)}/48`;
-      img.alt = "";
+      img.alt = name;
       img.loading = "lazy";
+
+      // fallback if avatar fails to load
+      img.onerror = function(){
+        this.src = `https://mc-heads.net/avatar/MHF_Steve/48`;
+      };
 
       const span = document.createElement("span");
       span.textContent = name;
@@ -165,13 +164,17 @@ function renderPlayerList(online, list, els){
     return;
   }
 
-  // online but no name list exposed by the server
+  // online but server hides the name list — show count only
   gridEl.style.display = "none";
   emptyEl.style.display = "flex";
   if(emptyCount) emptyCount.textContent = online;
-  if(emptyNote) emptyNote.textContent = online > 0
-    ? "Player list is private — only the count is shown."
-    : "Be the first one in — the world is waiting.";
+  if(emptyNote){
+    if(online > 0){
+      emptyNote.textContent = "Player list is private — only the count is shown. Set hide-online-players=false in server.properties to show names.";
+    }else{
+      emptyNote.textContent = "Be the first one in — the world is waiting.";
+    }
+  }
 }
 
 function renderOfflineState(els){
@@ -317,7 +320,6 @@ if(checkoutForm){
 
     if(!currentItem || !username || !email) return;
 
-    // basic per-edition username check
     const javaPattern = /^[A-Za-z0-9_]{3,16}$/;
     if(edition === "java" && !javaPattern.test(username)){
       msgEl.textContent = "That doesn't look like a valid Java username (3-16 letters, numbers, or _).";
@@ -375,7 +377,6 @@ if(checkoutForm){
       return;
     }
 
-    // build the payment QR
     const qrData = encodeURIComponent(
       `CoffeMC | ${currentItem.name} | ${currentItem.price} | Order ${orderId}`
     );
