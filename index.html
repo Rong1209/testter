@@ -81,23 +81,12 @@
 
       <div class="status-group">
         <div class="status-block">
-          <div class="label">
-            <svg class="plat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-            Java
-          </div>
+          <div class="label">Players Online</div>
           <div class="status-row">
             <span class="status-dot" id="statusDotJava"></span>
             <span id="playersJava">Checking...</span>
-          </div>
-        </div>
-        <div class="status-block">
-          <div class="label">
-            <svg class="plat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12" y2="18.01"/></svg>
-            Bedrock
-          </div>
-          <div class="status-row">
-            <span class="status-dot" id="statusDotBedrock"></span>
-            <span id="playersBedrock">Checking...</span>
+            <span id="statusDotBedrock" style="display:none"></span>
+            <span id="playersBedrock" style="display:none"></span>
           </div>
         </div>
       </div>
@@ -129,14 +118,13 @@
       <div class="players-panel-head">
         <h3>Online players</h3>
         <div class="players-count">
-          <strong id="onlineCount">0</strong> <span style="color:var(--text-faint);font-weight:400">players online</span> <span id="maxCount" style="display:none"></span>
+          <strong id="onlineCount">0</strong> <span style="color:var(--text-faint);font-weight:400">online</span><span id="maxCount" style="display:none"></span>
         </div>
       </div>
 
       <div class="player-grid" id="playerGrid"></div>
       <div class="players-empty" id="playersEmpty" style="display:none">
         <div class="big" id="emptyCount">0</div>
-        <div>players currently exploring CoffeMC</div>
         <small id="emptyNote">Player list is private — only the count is shown.</small>
       </div>
     </div>
