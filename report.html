@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Report a Player — CoffeMC</title>
+<meta name="description" content="Report a player on CoffeMC with video proof. Limited to one report per day.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="wrap nav-inner">
+    <a href="index.html" class="brand">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span>
+        CoffeMC
+        <small>Java &amp; Bedrock</small>
+      </span>
+    </a>
+
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="index.html#world">Live World</a>
+      <a href="index.html#rules">Rules</a>
+      <a href="store.html">Store</a>
+      <a href="report.html" class="active">Report</a>
+      <div class="auth-nav-slot"></div>
+    </div>
+
+    <a href="store.html" class="nav-cta desktop-only">Visit Store</a>
+
+    <button class="menu-btn" onclick="toggleMenu()" aria-label="Toggle menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+  </div>
+
+  <div class="wrap">
+    <div id="menu">
+      <a href="index.html">Home</a>
+      <a href="index.html#world">Live World</a>
+      <a href="index.html#rules">Rules</a>
+      <a href="store.html">Store</a>
+      <a href="report.html" class="active">Report</a>
+      <div class="auth-nav-slot"></div>
+    </div>
+  </div>
+</nav>
+
+<section class="auth-section">
+  <div class="report-card">
+    <p class="eyebrow" style="color:var(--danger)">Report a player</p>
+    <h1>Submit a report</h1>
+    <p class="auth-sub">
+      Saw someone breaking the rules? Attach a short video as proof (max
+      50MB) and our staff will be notified right away. To prevent spam,
+      you can only submit one report per day from the same connection.
+    </p>
+
+    <form id="reportForm">
+      <div class="field">
+        <label for="reportName">Your name</label>
+        <input type="text" id="reportName" placeholder="Your Minecraft username or name" required>
+      </div>
+
+      <div class="field">
+        <label>Video proof (max 50MB)</label>
+        <label class="file-drop" id="fileDrop">
+          <input type="file" id="reportVideo" accept="video/*" required>
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+          <span class="file-name" id="fileName">Click to choose a video</span>
+          <span class="file-hint">MP4, MOV, or WEBM — up to 50MB</span>
+        </label>
+      </div>
+
+      <button type="submit" class="btn btn-primary">Submit report</button>
+      <div class="form-msg" id="reportMsg"></div>
+    </form>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap footer-inner">
+    <span>&copy; 2026 CoffeMC. Not affiliated with Mojang or Microsoft.</span>
+    <div class="footer-links">
+      <a href="index.html">Home</a>
+      <a href="store.html">Store</a>
+      <a href="index.html#rules">Rules</a>
+    </div>
+  </div>
+</footer>
+
+<script src="auth.js"></script>
+<script src="script.js"></script>
+<script>
+  const MAX_VIDEO_BYTES = 50 * 1024 * 1024;
+
+  const fileInput = document.getElementById("reportVideo");
+  const fileNameEl = document.getElementById("fileName");
+
+  fileInput.addEventListener("change", function(){
+    if(this.files && this.files[0]){
+      const file = this.files[0];
+      fileNameEl.textContent = `${file.name} (${(file.size / (1024*1024)).toFixed(1)} MB)`;
+    }else{
+      fileNameEl.textContent = "Click to choose a video";
+    }
+  });
+
+  const reportForm = document.getElementById("reportForm");
+  reportForm.addEventListener("submit", async function(e){
+    e.preventDefault();
+
+    const name = document.getElementById("reportName").value.trim();
+    const file = fileInput.files[0];
+    const msgEl = document.getElementById("reportMsg");
+    const submitBtn = reportForm.querySelector("button[type=submit]");
+
+    msgEl.textContent = "";
+    msgEl.className = "form-msg";
+
+    if(!name){
+      msgEl.textContent = "Please enter your name.";
+      msgEl.className = "form-msg err show";
+      return;
+    }
+    if(!file){
+      msgEl.textContent = "Please attach a video.";
+      msgEl.className = "form-msg err show";
+      return;
+    }
+    if(file.size > MAX_VIDEO_BYTES){
+      msgEl.textContent = "That video is too large — the limit is 50MB.";
+      msgEl.className = "form-msg err show";
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Uploading...";
+
+    try{
+      const form = new FormData();
+      form.append("name", name);
+      form.append("video", file);
+
+      const res = await apiFetch("/api/report", { method: "POST", body: form });
+      const data = await res.json();
+
+      if(!res.ok){
+        msgEl.textContent = data.error || "Couldn't submit your report. Please try again.";
+        msgEl.className = "form-msg err show";
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Submit report";
+        return;
+      }
+
+      msgEl.textContent = data.message || "Report submitted — thanks!";
+      msgEl.className = "form-msg ok show";
+      reportForm.reset();
+      fileNameEl.textContent = "Click to choose a video";
+      submitBtn.textContent = "Report submitted";
+    }catch(err){
+      console.error(err);
+      msgEl.textContent = "Couldn't reach the server. Please try again in a moment.";
+      msgEl.className = "form-msg err show";
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Submit report";
+    }
+  });
+</script>
+</body>
+</html>

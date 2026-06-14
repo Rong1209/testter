@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Store — CoffeMC</title>
+<meta name="description" content="Buy ranks, crate keys, and in-game items for the CoffeMC Java &amp; Bedrock server.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="wrap nav-inner">
+    <a href="index.html" class="brand">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span>
+        CoffeMC
+        <small>Java &amp; Bedrock</small>
+      </span>
+    </a>
+
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="index.html#world">Live World</a>
+      <a href="index.html#rules">Rules</a>
+      <a href="store.html" class="active">Store</a>
+      <a href="report.html">Report</a>
+      <div class="auth-nav-slot"></div>
+    </div>
+
+    <a href="index.html" class="nav-cta desktop-only">Back to Server</a>
+
+    <button class="menu-btn" onclick="toggleMenu()" aria-label="Toggle menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+  </div>
+
+  <div class="wrap">
+    <div id="menu">
+      <a href="index.html">Home</a>
+      <a href="index.html#world">Live World</a>
+      <a href="index.html#rules">Rules</a>
+      <a href="store.html" class="active">Store</a>
+      <a href="report.html">Report</a>
+      <div class="auth-nav-slot"></div>
+    </div>
+  </div>
+</nav>
+
+<header class="store-hero">
+  <div class="wrap">
+    <p class="eyebrow">The Vault</p>
+    <h1>Gear up for the journey ahead.</h1>
+    <p>Every purchase here is cosmetic or convenience — nothing that affects
+    survival balance for other players. Picking a tier unlocks everything in
+    the tiers below it too.</p>
+
+    <div class="tab-row" role="tablist" aria-label="Store categories">
+      <button class="tab-btn active" data-tab="ranks" onclick="switchTab('ranks')">Ranks</button>
+      <button class="tab-btn" data-tab="items" onclick="switchTab('items')">Items &amp; Crates</button>
+    </div>
+  </div>
+</header>
+
+<section style="padding-top:0">
+  <div class="wrap">
+
+    <!-- ================= RANKS ================= -->
+    <div class="tab-panel active" id="tab-ranks">
+      <div class="shop-grid">
+
+        <article class="item-card common">
+          <span class="rarity-tag">Common</span>
+          <div class="item-icon">🪵</div>
+          <h3>Wanderer</h3>
+          <p class="desc">A friendly starter rank for players who want a
+          small show of support.</p>
+          <ul class="perks">
+            <li>Custom chat tag [Wanderer]</li>
+            <li>1 extra player-warp slot</li>
+            <li>Access to /hat command</li>
+          </ul>
+          <div class="item-foot">
+            <div class="price">$4.99<small>One-time</small></div>
+            <button class="buy-btn" onclick="openCheckout('Wanderer Rank','$4.99')">Buy</button>
+          </div>
+        </article>
+
+        <article class="item-card rare">
+          <span class="rarity-tag">Rare</span>
+          <div class="item-icon">🧭</div>
+          <h3>Pathfinder</h3>
+          <p class="desc">For regulars who want more room to build and
+          travel a little faster.</p>
+          <ul class="perks">
+            <li>Everything in Wanderer</li>
+            <li>+5 extra land claim blocks</li>
+            <li>3 player-warp slots</li>
+            <li>Access to /nick command</li>
+          </ul>
+          <div class="item-foot">
+            <div class="price">$9.99<small>One-time</small></div>
+            <button class="buy-btn" onclick="openCheckout('Pathfinder Rank','$9.99')">Buy</button>
+          </div>
+        </article>
+
+        <article class="item-card epic">
+          <span class="rarity-tag">Epic</span>
+          <div class="item-icon">⛵</div>
+          <h3>Voyager</h3>
+          <p class="desc">A bigger toolkit for players who spend most of
+          their time exploring and trading.</p>
+          <ul class="perks">
+            <li>Everything in Pathfinder</li>
+            <li>+15 extra land claim blocks</li>
+            <li>Monthly crate key</li>
+            <li>Colored name in chat</li>
+            <li>Priority queue on full server</li>
+          </ul>
+          <div class="item-foot">
+            <div class="price">$19.99<small>One-time</small></div>
+            <button class="buy-btn" onclick="openCheckout('Voyager Rank','$19.99')">Buy</button>
+          </div>
+        </article>
+
+        <article class="item-card legendary">
+          <span class="rarity-tag">Legendary</span>
+          <div class="item-icon">🏝️</div>
+          <h3>Skyborn</h3>
+          <p class="desc">The full package — for players who want to back
+          the server and stand out doing it.</p>
+          <ul class="perks">
+            <li>Everything in Voyager</li>
+            <li>+30 extra land claim blocks</li>
+            <li>Weekly crate key</li>
+            <li>Exclusive particle trail cosmetic</li>
+            <li>Custom join message</li>
+            <li>Name in the #supporters Discord role</li>
+          </ul>
+          <div class="item-foot">
+            <div class="price">$34.99<small>One-time</small></div>
+            <button class="buy-btn" onclick="openCheckout('Skyborn Rank','$34.99')">Buy</button>
+          </div>
+        </article>
+
+      </div>
+    </div>
+
+    <!-- ================= ITEMS & CRATES ================= -->
+    <div class="tab-panel" id="tab-items">
+      <div class="shop-grid">
+
+        <article class="item-card common">
+          <span class="rarity-tag">Common</span>
+          <div class="item-icon">🔑</div>
+          <h3>Common Crate Key</h3>
+          <p class="desc">Opens the common crate for a chance at tools,
+          enchanted gear, and small coin bundles.</p>
+          <ul class="perks">
+            <li>1 key per purchase</li>
+            <li>Stacks with other keys</li>
+          </ul>
+          <div class="item-foot">
+            <div class="price">$2.99<small>Per key</small></div>
+            <button class="buy-btn" onclick="openCheckout('Common Crate Key','$2.99')">Buy</button>
+          </div>
+        </article>
+
+        <article class="item-card rare">
+          <span class="rarity-tag">Rare</span>
+          <div class="item-icon">🗝️</div>
+          <h3>Rare Crate Key</h3>
+          <p class="desc">Better odds at enchanted books, building
+          materials, and cosmetic dyes.</p>
+          <ul class="perks">
+            <li>1 key per purchase</li>
+            <li>Higher rare-item odds than common keys</li>
+          </ul>
+          <div class="item-foot">
+            <div class="price">$5.99<small>Per key</small></div>
+            <button class="buy-btn" onclick="openCheckout('Rare Crate Key','$5.99')">Buy</button>
+          </div>
+        </article>
+
+        <article class="item-card common">
+          <span class="rarity-tag">Common</span>
+          <div class="item-icon">🪙</div>
+          <h3>5,000 Coins</h3>
+          <p class="desc">In-game currency, delivered straight to your
+          player balance for use in shops.</p>
+          <ul class="perks">
+            <li>Delivered within a few minutes</li>
+            <li>Usable at any player shop</li>
+          </ul>
+          <div class="item-foot">
+            <div class="price">$3.49<small>One-time</small></div>
+            <button class="buy-btn" onclick="openCheckout('5,000 Coins','$3.49')">Buy</button>
+          </div>
+        </article>
+
+        <article class="item-card rare">
+          <span class="rarity-tag">Rare</span>
+          <div class="item-icon">💰</div>
+          <h3>15,000 Coins</h3>
+          <p class="desc">A bigger coin bundle for players setting up a
+          shop or saving for land.</p>
+          <ul class="perks">
+            <li>Delivered within a few minutes</li>
+            <li>Best coin-per-dollar value</li>
+          </ul>
+          <div class="item-foot">
+            <div class="price">$8.99<small>One-time</small></div>
+            <button class="buy-btn" onclick="openCheckout('15,000 Coins','$8.99')">Buy</button>
+          </div>
+        </article>
+
+        <article class="item-card epic">
+          <span class="rarity-tag">Epic</span>
+          <div class="item-icon">✨</div>
+          <h3>Elytra Trail Cosmetic</h3>
+          <p class="desc">A particle trail that follows you while gliding —
+          purely visual, visible to everyone.</p>
+          <ul class="perks">
+            <li>3 trail colors to choose from</li>
+            <li>Toggle on/off with /trail</li>
+          </ul>
+          <div class="item-foot">
+            <div class="price">$6.99<small>One-time</small></div>
+            <button class="buy-btn" onclick="openCheckout('Elytra Trail Cosmetic','$6.99')">Buy</button>
+          </div>
+        </article>
+
+        <article class="item-card rare">
+          <span class="rarity-tag">Rare</span>
+          <div class="item-icon">🏷️</div>
+          <h3>Nickname Token</h3>
+          <p class="desc">Change your display name in chat without
+          changing your Minecraft account name.</p>
+          <ul class="perks">
+            <li>1 nickname change</li>
+            <li>Subject to staff approval</li>
+          </ul>
+          <div class="item-foot">
+            <div class="price">$2.49<small>One-time</small></div>
+            <button class="buy-btn" onclick="openCheckout('Nickname Token','$2.49')">Buy</button>
+          </div>
+        </article>
+
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="cta-strip">
+      <div>
+        <h3>Not sure which rank fits?</h3>
+        <p>Ask in the #store-help channel on Discord — staff can walk you
+        through what each tier unlocks.</p>
+      </div>
+      <a href="index.html" class="btn btn-ghost">Back to Server Info</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap footer-inner">
+    <span>&copy; 2026 CoffeMC. Not affiliated with Mojang or Microsoft.</span>
+    <div class="footer-links">
+      <a href="index.html">Home</a>
+      <a href="store.html">Store</a>
+      <a href="index.html#rules">Rules</a>
+    </div>
+  </div>
+</footer>
+
+<!-- ================= CHECKOUT MODAL ================= -->
+<div class="modal-overlay" id="checkoutOverlay">
+  <div class="modal">
+    <button class="modal-close" onclick="closeCheckout()" aria-label="Close">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+
+    <div class="step-dots" aria-hidden="true">
+      <span id="dot1" class="done"></span>
+      <span id="dot2"></span>
+    </div>
+
+    <!-- STEP 1: delivery details -->
+    <div class="modal-step active" id="checkoutStep1">
+      <h3>Almost there</h3>
+      <p class="modal-sub">Tell us who to deliver this to. Your purchase is
+      applied to this exact account on CoffeMC.</p>
+
+      <div class="summary">
+        <span class="name" id="checkoutItemName">Item name</span>
+        <span class="price" id="checkoutItemPrice">$0.00</span>
+      </div>
+
+      <form id="checkoutForm">
+        <div class="field">
+          <label>Edition</label>
+          <div class="edition-toggle">
+            <input type="radio" name="edition" id="editionJava" value="java" checked>
+            <label for="editionJava">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+              Java
+            </label>
+            <input type="radio" name="edition" id="editionBedrock" value="bedrock">
+            <label for="editionBedrock">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12" y2="18.01"/></svg>
+              Bedrock
+            </label>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="mcUsername" id="mcUsernameLabel">Java username</label>
+          <input type="text" id="mcUsername" placeholder="e.g. SteveBuilds22" required>
+          <small id="mcUsernameHint">Case-sensitive — double check spelling before continuing.</small>
+        </div>
+        <div class="field">
+          <label for="mcEmail">Email (for your receipt)</label>
+          <input type="email" id="mcEmail" placeholder="you@example.com" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Continue to Payment</button>
+        <div class="form-msg" id="checkoutMsg"></div>
+      </form>
+    </div>
+
+    <!-- STEP 2: scan to pay -->
+    <div class="modal-step" id="checkoutStep2">
+      <h3>Scan to pay</h3>
+      <p class="modal-sub">Scan this code with your payment app. Your
+      receipt and items go to <span id="confirmEmail">your email</span> once
+      payment is confirmed.</p>
+
+      <div class="qr-box">
+        <img id="qrImage" src="" alt="Payment QR code" width="188" height="188">
+        <div class="qr-amount" id="qrAmount">$0.00</div>
+        <div class="qr-note" id="qrItemNote">Item</div>
+      </div>
+
+      <div class="order-id">Order reference: <span id="orderIdText">—</span></div>
+
+      <button type="button" class="btn btn-primary" id="doneBtn">Done — Back to Home</button>
+      <div class="form-msg" id="step2Msg"></div>
+    </div>
+
+  </div>
+</div>
+
+
+<script src="auth.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

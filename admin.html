@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — CoffeMC</title>
+<meta name="description" content="CoffeMC staff dashboard — approve orders and review player reports.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="wrap nav-inner">
+    <a href="index.html" class="brand">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span>
+        CoffeMC
+        <small>Java &amp; Bedrock</small>
+      </span>
+    </a>
+
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="index.html#world">Live World</a>
+      <a href="index.html#rules">Rules</a>
+      <a href="store.html">Store</a>
+      <a href="report.html">Report</a>
+      <div class="auth-nav-slot"></div>
+    </div>
+
+    <a href="dashboard.html" class="nav-cta desktop-only">My Dashboard</a>
+
+    <button class="menu-btn" onclick="toggleMenu()" aria-label="Toggle menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+  </div>
+
+  <div class="wrap">
+    <div id="menu">
+      <a href="index.html">Home</a>
+      <a href="index.html#world">Live World</a>
+      <a href="index.html#rules">Rules</a>
+      <a href="store.html">Store</a>
+      <a href="report.html">Report</a>
+      <div class="auth-nav-slot"></div>
+    </div>
+  </div>
+</nav>
+
+<section>
+  <div class="wrap">
+    <div class="dash-head">
+      <div>
+        <p class="eyebrow" style="color:var(--gold)">Staff only</p>
+        <h1>Admin dashboard</h1>
+        <p>Review incoming store orders and player reports.</p>
+      </div>
+    </div>
+
+    <div class="table-panel" style="margin-bottom:28px">
+      <h3>Store orders</h3>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Player</th>
+            <th>Edition</th>
+            <th>Item</th>
+            <th>Price</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="ordersBody">
+          <tr class="empty-row"><td colspan="7">Loading...</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="table-panel">
+      <h3>Player reports</h3>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Reported by</th>
+            <th>Date</th>
+            <th>Video proof</th>
+          </tr>
+        </thead>
+        <tbody id="reportsBody">
+          <tr class="empty-row"><td colspan="3">Loading...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap footer-inner">
+    <span>&copy; 2026 CoffeMC. Not affiliated with Mojang or Microsoft.</span>
+    <div class="footer-links">
+      <a href="index.html">Home</a>
+      <a href="store.html">Store</a>
+      <a href="index.html#rules">Rules</a>
+    </div>
+  </div>
+</footer>
+
+<script src="auth.js"></script>
+<script src="script.js"></script>
+<script>
+  (async function(){
+    if(!(await requireAdmin())) return;
+    loadOrders();
+    loadReports();
+  })();
+
+  async function loadOrders(){
+    const tbody = document.getElementById("ordersBody");
+    try{
+      const res = await apiFetch("/api/admin/orders");
+      if(res.status === 401 || res.status === 403){
+        window.location.href = "index.html";
+        return;
+      }
+      const data = await res.json();
+      const orders = data.orders || [];
+
+      if(orders.length === 0){
+        tbody.innerHTML = `<tr class="empty-row"><td colspan="7">No orders yet.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = "";
+      orders.forEach(order => {
+        const tr = document.createElement("tr");
+        tr.dataset.id = order.id;
+
+        const date = new Date(order.created_at).toLocaleString();
+        const editionLabel = order.edition === "java" ? "Java" : "Bedrock";
+        const statusClass = order.status === "approved" ? "approved" : "pending";
+        const statusLabel = order.status === "approved" ? "Approved" : "Pending";
+        const isPending = order.status !== "approved";
+
+        tr.innerHTML = `
+          <td class="mc-name">${escapeHtml(order.mc_username)}<br><span style="color:var(--text-faint);font-size:.78rem">${escapeHtml(order.user_email)}</span></td>
+          <td>${editionLabel}</td>
+          <td>${escapeHtml(order.item_name)}</td>
+          <td class="price">${escapeHtml(order.price)}</td>
+          <td>${date}</td>
+          <td><span class="status-badge ${statusClass}" data-status>${statusLabel}</span></td>
+          <td>${isPending ? `<button class="approve-btn" data-approve>Approve</button>` : ""}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      tbody.querySelectorAll("[data-approve]").forEach(btn => {
+        btn.addEventListener("click", () => approveOrder(btn));
+      });
+    }catch(err){
+      console.error(err);
+      tbody.innerHTML = `<tr class="empty-row"><td colspan="7">Couldn't load orders. Please refresh the page.</td></tr>`;
+    }
+  }
+
+  async function approveOrder(btn){
+    const tr = btn.closest("tr");
+    const id = tr.dataset.id;
+    btn.disabled = true;
+    btn.textContent = "Approving...";
+
+    try{
+      const res = await apiFetch(`/api/admin/orders/${id}/approve`, { method: "POST" });
+      if(!res.ok){
+        btn.disabled = false;
+        btn.textContent = "Approve";
+        alert("Couldn't approve this order. Please try again.");
+        return;
+      }
+
+      const badge = tr.querySelector("[data-status]");
+      badge.textContent = "Approved";
+      badge.className = "status-badge approved";
+      btn.remove();
+    }catch(err){
+      console.error(err);
+      btn.disabled = false;
+      btn.textContent = "Approve";
+    }
+  }
+
+  async function loadReports(){
+    const tbody = document.getElementById("reportsBody");
+    try{
+      const res = await apiFetch("/api/admin/reports");
+      const data = await res.json();
+      const reports = data.reports || [];
+
+      if(reports.length === 0){
+        tbody.innerHTML = `<tr class="empty-row"><td colspan="3">No reports yet.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = "";
+      reports.forEach(report => {
+        const tr = document.createElement("tr");
+        const date = new Date(report.created_at).toLocaleString();
+
+        tr.innerHTML = `
+          <td>${escapeHtml(report.reporter_name)}</td>
+          <td>${date}</td>
+          <td>${report.video_key ? `<a href="#" class="video-link" data-report="${report.id}">View video</a>` : "—"}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      tbody.querySelectorAll("[data-report]").forEach(link => {
+        link.addEventListener("click", (e) => {
+          e.preventDefault();
+          openReportVideo(link.dataset.report, link);
+        });
+      });
+    }catch(err){
+      console.error(err);
+      tbody.innerHTML = `<tr class="empty-row"><td colspan="3">Couldn't load reports. Please refresh the page.</td></tr>`;
+    }
+  }
+
+  async function openReportVideo(reportId, link){
+    const original = link.textContent;
+    link.textContent = "Loading...";
+    try{
+      const res = await apiFetch(`/api/admin/reports/${reportId}/video`);
+      if(!res.ok){
+        link.textContent = original;
+        alert("Couldn't load this video.");
+        return;
+      }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      window.open(url, "_blank");
+      link.textContent = original;
+    }catch(err){
+      console.error(err);
+      link.textContent = original;
+      alert("Couldn't load this video.");
+    }
+  }
+
+  function escapeHtml(str){
+    return String(str).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  }
+</script>
+</body>
+</html>
