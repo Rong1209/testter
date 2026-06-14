@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Store  CoffeMC</title>
+<title>Store — CoffeMC</title>
 <meta name="description" content="Buy ranks, crate keys, and in-game items for the CoffeMC Java &amp; Bedrock server.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -24,6 +24,7 @@
 
     <div class="nav-links">
       <a href="index.html">Home</a>
+      <a href="index.html#world">Live World</a>
       <a href="index.html#rules">Rules</a>
       <a href="store.html" class="active">Store</a>
       <a href="report.html">Report</a>
@@ -53,13 +54,14 @@
   <div class="wrap">
     <p class="eyebrow">The Vault</p>
     <h1>Gear up for the journey ahead.</h1>
-    <p>Every purchase here is cosmetic or convenience — nothing that affects
-    survival balance for other players. Picking a tier unlocks everything in
-    the tiers below it too.</p>
+    <p>Every purchase here is cosmetic or convenience — nothing that breaks
+    survival balance for other players. Higher tiers include everything from
+    the tiers below.</p>
 
     <div class="tab-row" role="tablist" aria-label="Store categories">
       <button class="tab-btn active" data-tab="ranks" onclick="switchTab('ranks')">Ranks</button>
-      <button class="tab-btn" data-tab="items" onclick="switchTab('items')">Items &amp; Crates</button>
+      <button class="tab-btn" data-tab="kits"  onclick="switchTab('kits')">Kits</button>
+      <button class="tab-btn" data-tab="keys"  onclick="switchTab('keys')">Crate Keys</button>
     </div>
   </div>
 </header>
@@ -73,178 +75,241 @@
 
         <article class="item-card common">
           <span class="rarity-tag">Common</span>
-          <div class="item-icon">🪵</div>
-          <h3>Wanderer</h3>
-          <p class="desc">A friendly starter rank for players who want a
-          small show of support.</p>
+          <div class="item-icon"><img src="img/img1.png" alt="Americano"></div>
+          <h3>Americano</h3>
+          <p class="desc">The classic starter rank — simple, solid, and a
+          great way to show your support.</p>
           <ul class="perks">
-            <li>Custom chat tag [Wanderer]</li>
-            <li>1 extra player-warp slot</li>
-            <li>Access to /hat command</li>
+            <li>/anvil</li>
+            <li>/ec</li>
+            <li>/craft</li>
+            <li>Land Claim 8 Chunks</li>
           </ul>
           <div class="item-foot">
             <div class="price">$4.99<small>One-time</small></div>
-            <button class="buy-btn" onclick="openCheckout('Wanderer Rank','$4.99')">Buy</button>
+            <button class="buy-btn" onclick="openCheckout('Americano Rank','$4.99')">Buy</button>
           </div>
         </article>
 
         <article class="item-card rare">
           <span class="rarity-tag">Rare</span>
-          <div class="item-icon">🧭</div>
-          <h3>Pathfinder</h3>
-          <p class="desc">For regulars who want more room to build and
-          travel a little faster.</p>
+          <div class="item-icon"><img src="img/img2.png" alt="Cappuccino"></div>
+          <h3>Cappuccino</h3>
+          <p class="desc">Smooth and versatile — for players who want a
+          bit more room to build and claim.</p>
           <ul class="perks">
-            <li>Everything in Wanderer</li>
-            <li>+5 extra land claim blocks</li>
-            <li>3 player-warp slots</li>
-            <li>Access to /nick command</li>
+            <li>/anvil</li>
+            <li>/ec</li>
+            <li>/craft</li>
+            <li>Land Claim 15 Chunks</li>
           </ul>
           <div class="item-foot">
             <div class="price">$9.99<small>One-time</small></div>
-            <button class="buy-btn" onclick="openCheckout('Pathfinder Rank','$9.99')">Buy</button>
+            <button class="buy-btn" onclick="openCheckout('Cappuccino Rank','$9.99')">Buy</button>
           </div>
         </article>
 
         <article class="item-card epic">
           <span class="rarity-tag">Epic</span>
-          <div class="item-icon">⛵</div>
-          <h3>Voyager</h3>
-          <p class="desc">A bigger toolkit for players who spend most of
-          their time exploring and trading.</p>
+          <div class="item-icon"><img src="img/img3.png" alt="Hotlatte"></div>
+          <h3>Hotlatte</h3>
+          <p class="desc">Extra spice for dedicated players — bigger
+          claims and repair on the go.</p>
           <ul class="perks">
-            <li>Everything in Pathfinder</li>
-            <li>+15 extra land claim blocks</li>
-            <li>Monthly crate key</li>
-            <li>Colored name in chat</li>
-            <li>Priority queue on full server</li>
+            <li>/anvil</li>
+            <li>/ec</li>
+            <li>/craft</li>
+            <li>/fix</li>
+            <li>Land Claim 20 Chunks</li>
           </ul>
           <div class="item-foot">
-            <div class="price">$19.99<small>One-time</small></div>
-            <button class="buy-btn" onclick="openCheckout('Voyager Rank','$19.99')">Buy</button>
+            <div class="price">$14.99<small>One-time</small></div>
+            <button class="buy-btn" onclick="openCheckout('Hotlatte Rank','$14.99')">Buy</button>
           </div>
         </article>
 
         <article class="item-card legendary">
           <span class="rarity-tag">Legendary</span>
-          <div class="item-icon">🏝️</div>
-          <h3>Skyborn</h3>
-          <p class="desc">The full package — for players who want to back
-          the server and stand out doing it.</p>
+          <div class="item-icon"><img src="img/img4.png" alt="Expresso"></div>
+          <h3>Expresso</h3>
+          <p class="desc">A shot of pure power — full utility commands
+          plus creative flight for builders.</p>
           <ul class="perks">
-            <li>Everything in Voyager</li>
-            <li>+30 extra land claim blocks</li>
-            <li>Weekly crate key</li>
-            <li>Exclusive particle trail cosmetic</li>
-            <li>Custom join message</li>
-            <li>Name in the #supporters Discord role</li>
+            <li>/anvil</li>
+            <li>/ec</li>
+            <li>/craft</li>
+            <li>/fix</li>
+            <li>/fly</li>
+            <li>Land Claim 25 Chunks</li>
           </ul>
           <div class="item-foot">
-            <div class="price">$34.99<small>One-time</small></div>
-            <button class="buy-btn" onclick="openCheckout('Skyborn Rank','$34.99')">Buy</button>
+            <div class="price">$19.99<small>One-time</small></div>
+            <button class="buy-btn" onclick="openCheckout('Expresso Rank','$19.99')">Buy</button>
+          </div>
+        </article>
+
+        <article class="item-card legendary" style="border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold-dim), 0 8px 32px var(--gold-dim);">
+          <span class="rarity-tag" style="background:var(--gold-dim);color:var(--gold);border-color:color-mix(in srgb,var(--gold) 40%,var(--border))">Ultra</span>
+          <div class="item-icon">👑</div>
+          <h3>UTL Caffe</h3>
+          <p class="desc">The ultimate package — everything unlocked,
+          maximum land, and the full claim kit.</p>
+          <ul class="perks">
+            <li>/anvil</li>
+            <li>/craft</li>
+            <li>/fix</li>
+            <li>/fly</li>
+            <li>/claim all kit</li>
+            <li>Land Claim 30 Chunks</li>
+            <li>Includes Americano rank kit</li>
+          </ul>
+          <div class="item-foot">
+            <div class="price">$24.99<small>One-time</small></div>
+            <button class="buy-btn" onclick="openCheckout('UTL Caffe Rank','$24.99')">Buy</button>
           </div>
         </article>
 
       </div>
     </div>
 
-    <!-- ================= ITEMS & CRATES ================= -->
-    <div class="tab-panel" id="tab-items">
+    <!-- ================= KITS ================= -->
+    <div class="tab-panel" id="tab-kits">
       <div class="shop-grid">
 
         <article class="item-card common">
           <span class="rarity-tag">Common</span>
-          <div class="item-icon">🔑</div>
-          <h3>Common Crate Key</h3>
-          <p class="desc">Opens the common crate for a chance at tools,
-          enchanted gear, and small coin bundles.</p>
+          <div class="item-icon">☕</div>
+          <h3>Americano Kit</h3>
+          <p class="desc">A starter kit to kick off your survival session
+          with the basics covered.</p>
           <ul class="perks">
-            <li>1 key per purchase</li>
-            <li>Stacks with other keys</li>
+            <li>Starter gear &amp; supplies</li>
+            <li>Delivered in-game</li>
           </ul>
           <div class="item-foot">
-            <div class="price">$2.99<small>Per key</small></div>
-            <button class="buy-btn" onclick="openCheckout('Common Crate Key','$2.99')">Buy</button>
+            <div class="price">$0.99<small>One-time</small></div>
+            <button class="buy-btn" onclick="openCheckout('Americano Kit','$0.99')">Buy</button>
           </div>
         </article>
 
         <article class="item-card rare">
           <span class="rarity-tag">Rare</span>
-          <div class="item-icon">🗝️</div>
-          <h3>Rare Crate Key</h3>
-          <p class="desc">Better odds at enchanted books, building
-          materials, and cosmetic dyes.</p>
+          <div class="item-icon">🥛</div>
+          <h3>Cappuccino Kit</h3>
+          <p class="desc">A step up — more resources and better tools to
+          get your base running faster.</p>
           <ul class="perks">
-            <li>1 key per purchase</li>
-            <li>Higher rare-item odds than common keys</li>
+            <li>Better gear &amp; resources</li>
+            <li>Delivered in-game</li>
           </ul>
           <div class="item-foot">
-            <div class="price">$5.99<small>Per key</small></div>
-            <button class="buy-btn" onclick="openCheckout('Rare Crate Key','$5.99')">Buy</button>
-          </div>
-        </article>
-
-        <article class="item-card common">
-          <span class="rarity-tag">Common</span>
-          <div class="item-icon">🪙</div>
-          <h3>5,000 Coins</h3>
-          <p class="desc">In-game currency, delivered straight to your
-          player balance for use in shops.</p>
-          <ul class="perks">
-            <li>Delivered within a few minutes</li>
-            <li>Usable at any player shop</li>
-          </ul>
-          <div class="item-foot">
-            <div class="price">$3.49<small>One-time</small></div>
-            <button class="buy-btn" onclick="openCheckout('5,000 Coins','$3.49')">Buy</button>
-          </div>
-        </article>
-
-        <article class="item-card rare">
-          <span class="rarity-tag">Rare</span>
-          <div class="item-icon">💰</div>
-          <h3>15,000 Coins</h3>
-          <p class="desc">A bigger coin bundle for players setting up a
-          shop or saving for land.</p>
-          <ul class="perks">
-            <li>Delivered within a few minutes</li>
-            <li>Best coin-per-dollar value</li>
-          </ul>
-          <div class="item-foot">
-            <div class="price">$8.99<small>One-time</small></div>
-            <button class="buy-btn" onclick="openCheckout('15,000 Coins','$8.99')">Buy</button>
+            <div class="price">$1.99<small>One-time</small></div>
+            <button class="buy-btn" onclick="openCheckout('Cappuccino Kit','$1.99')">Buy</button>
           </div>
         </article>
 
         <article class="item-card epic">
           <span class="rarity-tag">Epic</span>
-          <div class="item-icon">✨</div>
-          <h3>Elytra Trail Cosmetic</h3>
-          <p class="desc">A particle trail that follows you while gliding —
-          purely visual, visible to everyone.</p>
+          <div class="item-icon">🔥</div>
+          <h3>Hotlatte Kit</h3>
+          <p class="desc">Mid-tier supplies for players who want to skip
+          the grind and get straight to building.</p>
           <ul class="perks">
-            <li>3 trail colors to choose from</li>
-            <li>Toggle on/off with /trail</li>
+            <li>Enhanced gear &amp; materials</li>
+            <li>Delivered in-game</li>
           </ul>
           <div class="item-foot">
-            <div class="price">$6.99<small>One-time</small></div>
-            <button class="buy-btn" onclick="openCheckout('Elytra Trail Cosmetic','$6.99')">Buy</button>
+            <div class="price">$2.99<small>One-time</small></div>
+            <button class="buy-btn" onclick="openCheckout('Hotlatte Kit','$2.99')">Buy</button>
+          </div>
+        </article>
+
+        <article class="item-card legendary">
+          <span class="rarity-tag">Legendary</span>
+          <div class="item-icon">⚡</div>
+          <h3>Expresso Kit</h3>
+          <p class="desc">High-value gear and materials for players
+          looking to hit the ground running.</p>
+          <ul class="perks">
+            <li>Top-tier gear &amp; supplies</li>
+            <li>Delivered in-game</li>
+          </ul>
+          <div class="item-foot">
+            <div class="price">$3.99<small>One-time</small></div>
+            <button class="buy-btn" onclick="openCheckout('Expresso Kit','$3.99')">Buy</button>
+          </div>
+        </article>
+
+        <article class="item-card legendary" style="border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold-dim), 0 8px 32px var(--gold-dim);">
+          <span class="rarity-tag" style="background:var(--gold-dim);color:var(--gold);border-color:color-mix(in srgb,var(--gold) 40%,var(--border))">Ultra</span>
+          <div class="item-icon">👑</div>
+          <h3>Ultra Caffe Kit</h3>
+          <p class="desc">The full kit bundle — includes 5 of each item
+          inside, maximum value for serious players.</p>
+          <ul class="perks">
+            <li>5× of every included item</li>
+            <li>Best kit value in the store</li>
+            <li>Delivered in-game</li>
+          </ul>
+          <div class="item-foot">
+            <div class="price">$5.00<small>One-time</small></div>
+            <button class="buy-btn" onclick="openCheckout('Ultra Caffe Kit','$5.00')">Buy</button>
+          </div>
+        </article>
+
+      </div>
+    </div>
+
+    <!-- ================= CRATE KEYS ================= -->
+    <div class="tab-panel" id="tab-keys">
+      <div class="shop-grid">
+
+        <article class="item-card common">
+          <span class="rarity-tag">Common</span>
+          <div class="item-icon">🗝️</div>
+          <h3>Cappuccino Key</h3>
+          <p class="desc">Opens the Cappuccino crate for a chance at basic
+          gear, materials, and small bonuses.</p>
+          <ul class="perks">
+            <li>1 key per purchase</li>
+            <li>Stacks with other keys</li>
+          </ul>
+          <div class="item-foot">
+            <div class="price">$0.25<small>Per key</small></div>
+            <button class="buy-btn" onclick="openCheckout('Cappuccino Key','$0.25')">Buy</button>
           </div>
         </article>
 
         <article class="item-card rare">
           <span class="rarity-tag">Rare</span>
-          <div class="item-icon">🏷️</div>
-          <h3>Nickname Token</h3>
-          <p class="desc">Change your display name in chat without
-          changing your Minecraft account name.</p>
+          <div class="item-icon">🔑</div>
+          <h3>Hotlatte Key</h3>
+          <p class="desc">Better odds at enchanted gear, building
+          materials, and rare drops.</p>
           <ul class="perks">
-            <li>1 nickname change</li>
-            <li>Subject to staff approval</li>
+            <li>1 key per purchase</li>
+            <li>Higher drop rates than Cappuccino</li>
           </ul>
           <div class="item-foot">
-            <div class="price">$2.49<small>One-time</small></div>
-            <button class="buy-btn" onclick="openCheckout('Nickname Token','$2.49')">Buy</button>
+            <div class="price">$0.49<small>Per key</small></div>
+            <button class="buy-btn" onclick="openCheckout('Hotlatte Key','$0.49')">Buy</button>
+          </div>
+        </article>
+
+        <article class="item-card legendary" style="border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold-dim), 0 8px 32px var(--gold-dim);">
+          <span class="rarity-tag" style="background:var(--gold-dim);color:var(--gold);border-color:color-mix(in srgb,var(--gold) 40%,var(--border))">Ultra</span>
+          <div class="item-icon">👑</div>
+          <h3>UTL Key</h3>
+          <p class="desc">The top-tier crate key — highest odds at the
+          rarest loot in the entire server.</p>
+          <ul class="perks">
+            <li>1 key per purchase</li>
+            <li>Best drop rates in the store</li>
+            <li>Exclusive ultra-tier loot pool</li>
+          </ul>
+          <div class="item-foot">
+            <div class="price">$0.99<small>Per key</small></div>
+            <button class="buy-btn" onclick="openCheckout('UTL Key','$0.99')">Buy</button>
           </div>
         </article>
 
@@ -353,7 +418,6 @@
 
   </div>
 </div>
-
 
 <script src="auth.js"></script>
 <script src="script.js"></script>
