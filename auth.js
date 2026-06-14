@@ -4,7 +4,7 @@
    ============================================================ */
 
 // >>> EDIT THIS to your deployed Worker URL <<<
-const API_BASE = "https://coffemc-api.your-subdomain.workers.dev";
+const API_BASE = "https://coffemc-api.chhinkimrong.workers.dev";
 
 const AUTH_TOKEN_KEY = "coffemc_token";
 const AUTH_USER_KEY = "coffemc_user";
