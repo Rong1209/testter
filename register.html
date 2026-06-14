@@ -81,6 +81,15 @@
       <div class="form-msg" id="regMsg"></div>
     </form>
 
+    <!-- shown after successful registration -->
+    <div id="resendSection" style="display:none;margin-top:16px;text-align:center">
+      <p style="color:var(--text-faint);font-size:.9rem;margin-bottom:8px">Didn't get the email?</p>
+      <button id="resendBtn" class="btn btn-ghost" style="font-size:.9rem;padding:8px 18px">
+        Resend verification email
+      </button>
+      <div class="form-msg" id="resendMsg" style="margin-top:8px"></div>
+    </div>
+
     <div class="auth-switch">
       Already have an account? <a href="login.html">Log in</a>
     </div>
@@ -101,6 +110,9 @@
 <script src="auth.js"></script>
 <script src="script.js"></script>
 <script>
+  let registeredEmail = "";
+  let resendCountdownTimer = null;
+
   const registerForm = document.getElementById("registerForm");
   registerForm.addEventListener("submit", async function(e){
     e.preventDefault();
@@ -140,10 +152,17 @@
         return;
       }
 
+      // success — show message and resend section
+      registeredEmail = email;
       msgEl.textContent = data.message || "Check your email for a verification link.";
       msgEl.className = "form-msg ok show";
       registerForm.reset();
       submitBtn.textContent = "Account created";
+
+      // show the resend button and start 5-minute cooldown
+      document.getElementById("resendSection").style.display = "block";
+      startResendCooldown(300);
+
     }catch(err){
       console.error(err);
       msgEl.textContent = "Couldn't reach the server. Please try again in a moment.";
@@ -152,6 +171,77 @@
       submitBtn.textContent = "Create account";
     }
   });
+
+  document.getElementById("resendBtn").addEventListener("click", async function(){
+    if(!registeredEmail) return;
+
+    const btn = this;
+    const msgEl = document.getElementById("resendMsg");
+
+    btn.disabled = true;
+    btn.textContent = "Sending...";
+    msgEl.textContent = "";
+    msgEl.className = "form-msg";
+
+    try{
+      const res = await apiFetch("/api/resend-verification", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: registeredEmail })
+      });
+      const data = await res.json();
+
+      if(!res.ok){
+        msgEl.textContent = data.error || "Couldn't send email. Try again later.";
+        msgEl.className = "form-msg err show";
+        btn.disabled = false;
+        btn.textContent = "Resend verification email";
+        return;
+      }
+
+      msgEl.textContent = data.message || "Sent! Check your inbox.";
+      msgEl.className = "form-msg ok show";
+
+      // restart 5-minute cooldown
+      startResendCooldown(300);
+
+    }catch(err){
+      console.error(err);
+      msgEl.textContent = "Couldn't reach the server. Please try again.";
+      msgEl.className = "form-msg err show";
+      btn.disabled = false;
+      btn.textContent = "Resend verification email";
+    }
+  });
+
+  function startResendCooldown(seconds){
+    const btn = document.getElementById("resendBtn");
+    btn.disabled = true;
+
+    if(resendCountdownTimer) clearInterval(resendCountdownTimer);
+
+    let remaining = seconds;
+
+    function updateLabel(){
+      const m = Math.floor(remaining / 60);
+      const s = remaining % 60;
+      btn.textContent = `Resend again in ${m}:${String(s).padStart(2, "0")}`;
+    }
+
+    updateLabel();
+
+    resendCountdownTimer = setInterval(function(){
+      remaining--;
+      if(remaining <= 0){
+        clearInterval(resendCountdownTimer);
+        resendCountdownTimer = null;
+        btn.disabled = false;
+        btn.textContent = "Resend verification email";
+      } else {
+        updateLabel();
+      }
+    }, 1000);
+  }
 </script>
 </body>
 </html>
