@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reset Password — CoffeMC</title>
+<meta name="description" content="Set a new password for your CoffeMC account.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="wrap nav-inner">
+    <a href="index.html" class="brand">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span>
+        CoffeMC
+        <small>Java &amp; Bedrock</small>
+      </span>
+    </a>
+
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="index.html#world">Live World</a>
+      <a href="index.html#rules">Rules</a>
+      <a href="store.html">Store</a>
+      <a href="report.html">Report</a>
+      <div class="auth-nav-slot"></div>
+    </div>
+
+    <a href="index.html" class="nav-cta desktop-only">Back to Server</a>
+
+    <button class="menu-btn" onclick="toggleMenu()" aria-label="Toggle menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+  </div>
+
+  <div class="wrap">
+    <div id="menu">
+      <a href="index.html">Home</a>
+      <a href="index.html#world">Live World</a>
+      <a href="index.html#rules">Rules</a>
+      <a href="store.html">Store</a>
+      <a href="report.html">Report</a>
+      <div class="auth-nav-slot"></div>
+    </div>
+  </div>
+</nav>
+
+<section class="auth-section">
+  <div class="auth-card" id="resetCard">
+    <p class="eyebrow">Account recovery</p>
+    <h1>Set new password</h1>
+    <p class="auth-sub">
+      Choose a new password for your CoffeMC account. Must be at least
+      8 characters.
+    </p>
+
+    <form id="resetForm">
+      <div class="field">
+        <label for="newPassword">New password</label>
+        <input type="password" id="newPassword" placeholder="At least 8 characters" minlength="8" required>
+      </div>
+      <div class="field">
+        <label for="confirmPassword">Confirm new password</label>
+        <input type="password" id="confirmPassword" placeholder="Re-enter your password" minlength="8" required>
+      </div>
+      <button type="submit" class="btn btn-primary">Update password</button>
+      <div class="form-msg" id="resetMsg"></div>
+    </form>
+  </div>
+
+  <!-- Shown if the token is missing or invalid -->
+  <div class="auth-card" id="invalidCard" style="display:none">
+    <p class="eyebrow" style="color:var(--danger)">Link expired</p>
+    <h1>Invalid reset link</h1>
+    <p class="auth-sub">
+      This password reset link is invalid or has expired (links last
+      1 hour). Request a new one below.
+    </p>
+    <a href="forgot-password.html" class="btn btn-primary" style="display:flex;justify-content:center;margin-top:8px">
+      Request new link
+    </a>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap footer-inner">
+    <span>&copy; 2026 CoffeMC. Not affiliated with Mojang or Microsoft.</span>
+    <div class="footer-links">
+      <a href="index.html">Home</a>
+      <a href="store.html">Store</a>
+      <a href="index.html#rules">Rules</a>
+    </div>
+  </div>
+</footer>
+
+<script src="auth.js"></script>
+<script src="script.js"></script>
+<script>
+  // Read the token from the URL: ?token=xxx
+  const params = new URLSearchParams(window.location.search);
+  const resetToken = params.get("token");
+
+  if (!resetToken) {
+    document.getElementById("resetCard").style.display = "none";
+    document.getElementById("invalidCard").style.display = "block";
+  }
+
+  const resetForm = document.getElementById("resetForm");
+  resetForm.addEventListener("submit", async function(e) {
+    e.preventDefault();
+
+    const password = document.getElementById("newPassword").value;
+    const confirmPassword = document.getElementById("confirmPassword").value;
+    const msgEl = document.getElementById("resetMsg");
+    const submitBtn = resetForm.querySelector("button[type=submit]");
+
+    msgEl.textContent = "";
+    msgEl.className = "form-msg";
+
+    if (password !== confirmPassword) {
+      msgEl.textContent = "Passwords do not match.";
+      msgEl.className = "form-msg err show";
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Updating...";
+
+    try {
+      const res = await apiFetch("/api/reset-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token: resetToken, password, confirmPassword })
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        // Token expired or invalid
+        if (res.status === 400 || res.status === 404) {
+          document.getElementById("resetCard").style.display = "none";
+          document.getElementById("invalidCard").style.display = "block";
+          return;
+        }
+        msgEl.textContent = data.error || "Something went wrong. Please try again.";
+        msgEl.className = "form-msg err show";
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Update password";
+        return;
+      }
+
+      msgEl.textContent = "Password updated! Redirecting to login...";
+      msgEl.className = "form-msg ok show";
+      submitBtn.textContent = "Done!";
+
+      setTimeout(() => {
+        window.location.href = "login.html";
+      }, 2000);
+    } catch(err) {
+      console.error(err);
+      msgEl.textContent = "Couldn't reach the server. Please try again in a moment.";
+      msgEl.className = "form-msg err show";
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Update password";
+    }
+  });
+</script>
+</body>
+</html>
