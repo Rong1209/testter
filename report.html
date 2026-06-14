@@ -51,19 +51,40 @@
 </nav>
 
 <section class="auth-section">
-  <div class="report-card">
+
+  <!-- Shown when NOT logged in -->
+  <div class="auth-card" id="guestCard" style="display:none">
+    <p class="eyebrow" style="color:var(--danger)">Login required</p>
+    <h1>Sign in to report</h1>
+    <p class="auth-sub">
+      You need a CoffeMC account to submit a player report. This helps
+      us prevent spam and follow up with you if needed.
+    </p>
+    <a href="login.html?next=report.html" class="btn btn-primary" style="display:flex;justify-content:center;margin-bottom:12px">
+      Log in
+    </a>
+    <a href="register.html" class="btn btn-ghost" style="display:flex;justify-content:center">
+      Create an account
+    </a>
+    <div class="auth-switch" style="margin-top:20px">
+      It's free and only takes a minute.
+    </div>
+  </div>
+
+  <!-- Shown when logged in -->
+  <div class="report-card" id="reportCard" style="display:none">
     <p class="eyebrow" style="color:var(--danger)">Report a player</p>
     <h1>Submit a report</h1>
     <p class="auth-sub">
       Saw someone breaking the rules? Attach a short video as proof (max
-      50MB) and our staff will be notified right away. To prevent spam,
-      you can only submit one report per day from the same connection.
+      50MB) and our staff will be notified right away. You can only
+      submit one report per day.
     </p>
 
     <form id="reportForm">
       <div class="field">
-        <label for="reportName">Your name</label>
-        <input type="text" id="reportName" placeholder="Your Minecraft username or name" required>
+        <label for="reportName">Your Minecraft username</label>
+        <input type="text" id="reportName" placeholder="Your in-game name" required>
       </div>
 
       <div class="field">
@@ -80,6 +101,7 @@
       <div class="form-msg" id="reportMsg"></div>
     </form>
   </div>
+
 </section>
 
 <footer>
@@ -96,16 +118,29 @@
 <script src="auth.js"></script>
 <script src="script.js"></script>
 <script>
+  // Show correct card based on login state
+  if (isLoggedIn()) {
+    document.getElementById("reportCard").style.display = "block";
+
+    // Pre-fill name from account if available
+    const user = getStoredUser();
+    if (user && user.name) {
+      document.getElementById("reportName").value = user.name;
+    }
+  } else {
+    document.getElementById("guestCard").style.display = "block";
+  }
+
   const MAX_VIDEO_BYTES = 50 * 1024 * 1024;
 
   const fileInput = document.getElementById("reportVideo");
   const fileNameEl = document.getElementById("fileName");
 
   fileInput.addEventListener("change", function(){
-    if(this.files && this.files[0]){
+    if (this.files && this.files[0]) {
       const file = this.files[0];
-      fileNameEl.textContent = `${file.name} (${(file.size / (1024*1024)).toFixed(1)} MB)`;
-    }else{
+      fileNameEl.textContent = `${file.name} (${(file.size / (1024 * 1024)).toFixed(1)} MB)`;
+    } else {
       fileNameEl.textContent = "Click to choose a video";
     }
   });
@@ -122,26 +157,32 @@
     msgEl.textContent = "";
     msgEl.className = "form-msg";
 
-    if(!name){
-      msgEl.textContent = "Please enter your name.";
+    if (!name) {
+      msgEl.textContent = "Please enter your Minecraft username.";
       msgEl.className = "form-msg err show";
       return;
     }
-    if(!file){
+    if (!file) {
       msgEl.textContent = "Please attach a video.";
       msgEl.className = "form-msg err show";
       return;
     }
-    if(file.size > MAX_VIDEO_BYTES){
+    if (file.size > MAX_VIDEO_BYTES) {
       msgEl.textContent = "That video is too large — the limit is 50MB.";
       msgEl.className = "form-msg err show";
+      return;
+    }
+
+    // Double-check still logged in before submitting
+    if (!isLoggedIn()) {
+      window.location.href = "login.html?next=report.html";
       return;
     }
 
     submitBtn.disabled = true;
     submitBtn.textContent = "Uploading...";
 
-    try{
+    try {
       const form = new FormData();
       form.append("name", name);
       form.append("video", file);
@@ -149,7 +190,13 @@
       const res = await apiFetch("/api/report", { method: "POST", body: form });
       const data = await res.json();
 
-      if(!res.ok){
+      if (res.status === 401) {
+        clearSession();
+        window.location.href = "login.html?next=report.html";
+        return;
+      }
+
+      if (!res.ok) {
         msgEl.textContent = data.error || "Couldn't submit your report. Please try again.";
         msgEl.className = "form-msg err show";
         submitBtn.disabled = false;
@@ -162,7 +209,7 @@
       reportForm.reset();
       fileNameEl.textContent = "Click to choose a video";
       submitBtn.textContent = "Report submitted";
-    }catch(err){
+    } catch(err) {
       console.error(err);
       msgEl.textContent = "Couldn't reach the server. Please try again in a moment.";
       msgEl.className = "form-msg err show";
