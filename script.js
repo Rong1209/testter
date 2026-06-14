@@ -18,9 +18,7 @@ function copyIP(){
   const msg = document.getElementById("copied");
   if(!msg) return;
   msg.classList.add("show");
-  setTimeout(() => {
-    msg.classList.remove("show");
-  }, 2200);
+  setTimeout(() => { msg.classList.remove("show"); }, 2200);
 }
 
 /* ============================================================
@@ -42,27 +40,23 @@ document.addEventListener("click", function(e){
 });
 
 /* ============================================================
-   SERVER STATUS + LIVE PLAYER LIST (Java + Bedrock)
+   SERVER STATUS + LIVE PLAYER LIST
    ============================================================ */
 async function checkServer(){
   if(checking) return;
   checking = true;
 
   const els = {
-    playersJava:    document.getElementById("playersJava"),
-    playersBedrock: document.getElementById("playersBedrock"),
-    dotJava:        document.getElementById("statusDotJava"),
-    dotBedrock:     document.getElementById("statusDotBedrock"),
-    onlineEl:       document.getElementById("onlineCount"),
-    maxEl:          document.getElementById("maxCount"),
+    playersJava:    document.getElementById("playersJava"),   // hero card text (repurposed as total)
+    dotJava:        document.getElementById("statusDotJava"), // hero card dot
+    onlineEl:       document.getElementById("onlineCount"),   // Live World panel count
     gridEl:         document.getElementById("playerGrid"),
     emptyEl:        document.getElementById("playersEmpty"),
     emptyCount:     document.getElementById("emptyCount"),
     emptyNote:      document.getElementById("emptyNote"),
   };
 
-  if(els.playersJava)    els.playersJava.textContent = "Checking...";
-  if(els.playersBedrock) els.playersBedrock.textContent = "Checking...";
+  if(els.playersJava) els.playersJava.textContent = "Checking...";
 
   try{
     let javaData, bedrockData;
@@ -72,9 +66,9 @@ async function checkServer(){
       const res = await fetch(url, { method: "GET", cache: "no-store" });
       if(!res.ok) throw new Error("API Error");
       const data = await res.json();
-      javaData = data.java;
+      javaData    = data.java;
       bedrockData = data.bedrock;
-    }else{
+    } else {
       const [javaRes, bedrockRes] = await Promise.all([
         fetch(`https://api.mcsrvstat.us/3/${SERVER_DOMAIN}?t=${Date.now()}`, { cache: "no-store" }),
         fetch(`https://api.mcsrvstat.us/bedrock/3/${SERVER_DOMAIN}:${BEDROCK_PORT}?t=${Date.now()}`, { cache: "no-store" })
@@ -83,51 +77,43 @@ async function checkServer(){
       bedrockData = bedrockRes.ok ? await bedrockRes.json() : { online: false };
     }
 
-    applyStatus(javaData, els.playersJava, els.dotJava);
-    applyStatus(bedrockData, els.playersBedrock, els.dotBedrock);
-
-    const javaOnline    = javaData?.online    ? (javaData.players?.online ?? 0)    : 0;
+    const javaOnline    = javaData?.online    ? (javaData.players?.online    ?? 0) : 0;
     const bedrockOnline = bedrockData?.online ? (bedrockData.players?.online ?? 0) : 0;
     const totalOnline   = javaOnline + bedrockOnline;
     const anyOnline     = !!(javaData?.online || bedrockData?.online);
 
-    // combined total, no max slots shown
-    if(els.onlineEl) els.onlineEl.textContent = totalOnline;
-    if(els.maxEl)    els.maxEl.textContent = "";
+    // hero card — single dot + total count
+    if(els.dotJava){
+      if(anyOnline) els.dotJava.classList.add("online");
+      else          els.dotJava.classList.remove("online");
+    }
+    if(els.playersJava){
+      els.playersJava.textContent = anyOnline ? `${totalOnline} online` : "Offline";
+    }
 
-    // merge real player name lists from both editions
+    // Live World panel count
+    if(els.onlineEl) els.onlineEl.textContent = totalOnline;
+
+    // merge real player name lists from Java + Bedrock
     const list = [
-      ...(javaData?.players?.list ?? []),
+      ...(javaData?.players?.list    ?? []),
       ...(bedrockData?.players?.list ?? [])
     ];
 
     if(anyOnline){
       renderPlayerList(totalOnline, list, els);
-    }else{
+    } else {
       renderOfflineState(els);
     }
-  }catch(err){
-    console.error("Server check failed:", err);
-    if(els.playersJava)    els.playersJava.textContent = "Offline";
-    if(els.playersBedrock) els.playersBedrock.textContent = "Offline";
-    if(els.dotJava)    els.dotJava.classList.remove("online");
-    if(els.dotBedrock) els.dotBedrock.classList.remove("online");
-    if(els.onlineEl) els.onlineEl.textContent = "0";
-    if(els.maxEl)    els.maxEl.textContent = "";
-    renderOfflineState(els);
-  }finally{
-    checking = false;
-  }
-}
 
-function applyStatus(data, textEl, dotEl){
-  if(data && data.online === true){
-    const online = data.players?.online ?? 0;
-    if(textEl) textEl.textContent = `${online} online`;
-    if(dotEl) dotEl.classList.add("online");
-  }else{
-    if(textEl) textEl.textContent = "Offline";
-    if(dotEl) dotEl.classList.remove("online");
+  } catch(err){
+    console.error("Server check failed:", err);
+    if(els.dotJava) els.dotJava.classList.remove("online");
+    if(els.playersJava) els.playersJava.textContent = "Offline";
+    if(els.onlineEl)    els.onlineEl.textContent = "0";
+    renderOfflineState(els);
+  } finally {
+    checking = false;
   }
 }
 
@@ -148,11 +134,7 @@ function renderPlayerList(online, list, els){
       img.src = `https://mc-heads.net/avatar/${encodeURIComponent(name)}/48`;
       img.alt = name;
       img.loading = "lazy";
-
-      // fallback if avatar fails to load
-      img.onerror = function(){
-        this.src = `https://mc-heads.net/avatar/MHF_Steve/48`;
-      };
+      img.onerror = function(){ this.src = "https://mc-heads.net/avatar/MHF_Steve/48"; };
 
       const span = document.createElement("span");
       span.textContent = name;
@@ -164,16 +146,14 @@ function renderPlayerList(online, list, els){
     return;
   }
 
-  // online but server hides the name list — show count only
+  // server online but hides the player list
   gridEl.style.display = "none";
   emptyEl.style.display = "flex";
   if(emptyCount) emptyCount.textContent = online;
   if(emptyNote){
-    if(online > 0){
-      emptyNote.textContent = "Player list is private — only the count is shown. Set hide-online-players=false in server.properties to show names.";
-    }else{
-      emptyNote.textContent = "Be the first one in — the world is waiting.";
-    }
+    emptyNote.textContent = online > 0
+      ? "Player list is private — set hide-online-players=false in server.properties to show names."
+      : "Be the first one in — the world is waiting.";
   }
 }
 
@@ -183,7 +163,7 @@ function renderOfflineState(els){
   gridEl.style.display = "none";
   emptyEl.style.display = "flex";
   if(emptyCount) emptyCount.textContent = "0";
-  if(emptyNote) emptyNote.textContent = "The server looks offline right now — try again shortly.";
+  if(emptyNote)  emptyNote.textContent = "The server looks offline right now — try again shortly.";
 }
 
 checkServer();
@@ -246,10 +226,8 @@ function goToStep(step){
   document.querySelectorAll(".step-dots span").forEach(dot => {
     dot.classList.remove("done");
   });
-
   const target = document.getElementById(`checkoutStep${step}`);
   if(target) target.classList.add("active");
-
   for(let i = 1; i <= step; i++){
     const dot = document.getElementById(`dot${i}`);
     if(dot) dot.classList.add("done");
@@ -261,23 +239,19 @@ function openCheckout(name, price){
     window.location.href = `login.html?next=${encodeURIComponent("store.html")}`;
     return;
   }
-
   currentItem = { name, price };
-
   const overlay  = document.getElementById("checkoutOverlay");
   const nameEl   = document.getElementById("checkoutItemName");
   const priceEl  = document.getElementById("checkoutItemPrice");
   const msgEl    = document.getElementById("checkoutMsg");
   const step2Msg = document.getElementById("step2Msg");
   const form     = document.getElementById("checkoutForm");
-
   if(!overlay) return;
   if(nameEl)  nameEl.textContent = name;
   if(priceEl) priceEl.textContent = price;
   if(msgEl)   { msgEl.textContent = ""; msgEl.className = "form-msg"; }
   if(step2Msg){ step2Msg.textContent = ""; step2Msg.className = "form-msg"; }
   if(form)    form.reset();
-
   const emailEl = document.getElementById("mcEmail");
   if(emailEl && typeof getStoredUser === "function"){
     const user = getStoredUser();
@@ -286,7 +260,6 @@ function openCheckout(name, price){
       emailEl.readOnly = true;
     }
   }
-
   updateEditionCopy();
   goToStep(1);
   overlay.classList.add("show");
@@ -311,15 +284,12 @@ const checkoutForm = document.getElementById("checkoutForm");
 if(checkoutForm){
   checkoutForm.addEventListener("submit", async function(e){
     e.preventDefault();
-
     const edition  = getSelectedEdition();
     const username = document.getElementById("mcUsername").value.trim();
     const email    = document.getElementById("mcEmail").value.trim();
     const msgEl    = document.getElementById("checkoutMsg");
     const submitBtn = checkoutForm.querySelector("button[type=submit]");
-
     if(!currentItem || !username || !email) return;
-
     const javaPattern = /^[A-Za-z0-9_]{3,16}$/;
     if(edition === "java" && !javaPattern.test(username)){
       msgEl.textContent = "That doesn't look like a valid Java username (3-16 letters, numbers, or _).";
@@ -331,44 +301,32 @@ if(checkoutForm){
       msgEl.className = "form-msg err";
       return;
     }
-
     if(typeof isLoggedIn === "function" && !isLoggedIn()){
       window.location.href = `login.html?next=${encodeURIComponent("store.html")}`;
       return;
     }
-
     submitBtn.disabled = true;
     submitBtn.textContent = "Processing...";
     msgEl.textContent = "";
     msgEl.className = "form-msg";
-
     let orderId;
     try{
       const res = await apiFetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          item: currentItem.name,
-          price: currentItem.price,
-          edition,
-          username
-        })
+        body: JSON.stringify({ item: currentItem.name, price: currentItem.price, edition, username })
       });
       const data = await res.json();
-
       if(!res.ok){
         msgEl.textContent = data.error || "Could not create your order. Please try again.";
         msgEl.className = "form-msg err";
         submitBtn.disabled = false;
         submitBtn.textContent = "Continue to Payment";
-        if(res.status === 401){
-          window.location.href = `login.html?next=${encodeURIComponent("store.html")}`;
-        }
+        if(res.status === 401) window.location.href = `login.html?next=${encodeURIComponent("store.html")}`;
         return;
       }
-
       orderId = data.order.id;
-    }catch(err){
+    } catch(err){
       console.error("Order creation failed:", err);
       msgEl.textContent = "Couldn't reach the server. Please try again in a moment.";
       msgEl.className = "form-msg err";
@@ -376,24 +334,18 @@ if(checkoutForm){
       submitBtn.textContent = "Continue to Payment";
       return;
     }
-
-    const qrData = encodeURIComponent(
-      `CoffeMC | ${currentItem.name} | ${currentItem.price} | Order ${orderId}`
-    );
-    const qrImage   = document.getElementById("qrImage");
-    const qrAmount  = document.getElementById("qrAmount");
-    const qrNote    = document.getElementById("qrItemNote");
+    const qrData = encodeURIComponent(`CoffeMC | ${currentItem.name} | ${currentItem.price} | Order ${orderId}`);
+    const qrImage      = document.getElementById("qrImage");
+    const qrAmount     = document.getElementById("qrAmount");
+    const qrNote       = document.getElementById("qrItemNote");
     const confirmEmail = document.getElementById("confirmEmail");
     const orderIdText  = document.getElementById("orderIdText");
-
-    if(qrImage)  qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${qrData}`;
-    if(qrAmount) qrAmount.textContent = currentItem.price;
-    if(qrNote)   qrNote.textContent = `${currentItem.name} — ${edition === "java" ? "Java" : "Bedrock"} (${username})`;
+    if(qrImage)      qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${qrData}`;
+    if(qrAmount)     qrAmount.textContent = currentItem.price;
+    if(qrNote)       qrNote.textContent = `${currentItem.name} — ${edition === "java" ? "Java" : "Bedrock"} (${username})`;
     if(confirmEmail) confirmEmail.textContent = email;
     if(orderIdText)  orderIdText.textContent = orderId;
-
     goToStep(2);
-
     submitBtn.disabled = false;
     submitBtn.textContent = "Continue to Payment";
   });
@@ -410,15 +362,11 @@ if(doneBtn){
    SOFT ANTI-INSPECT
    ============================================================ */
 (function(){
-  document.addEventListener("contextmenu", function(e){
-    e.preventDefault();
-  });
+  document.addEventListener("contextmenu", function(e){ e.preventDefault(); });
   document.addEventListener("keydown", function(e){
     const key = e.key.toLowerCase();
     if(key === "f12"){ e.preventDefault(); return false; }
-    if(e.ctrlKey && e.shiftKey && ["i","j","c"].includes(key)){
-      e.preventDefault(); return false;
-    }
+    if(e.ctrlKey && e.shiftKey && ["i","j","c"].includes(key)){ e.preventDefault(); return false; }
     if(e.ctrlKey && key === "u"){ e.preventDefault(); return false; }
     if(e.ctrlKey && key === "s"){ e.preventDefault(); return false; }
   });
